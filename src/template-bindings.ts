@@ -1,4 +1,5 @@
 import Bindings from './bindings';
+import BoundNode from './bound-node';
 
 interface TextBinding {
   name: string;
@@ -7,6 +8,7 @@ interface TextBinding {
 
 interface AttributeBinding {
   name: string;
+  attrName: string;
   path: number[];
 }
 
@@ -49,11 +51,38 @@ export default class TemplateBindings {
 
     if (node.nodeType === Node.ELEMENT_NODE) {
 
+      if (node.hasAttributes()) {
+
+        this.parseAttributes(bindings, node.attributes, path);
+
+      }
+
       if (node.hasChildNodes()) {
 
         this.parseNodes(bindings, node.childNodes, path);
 
       }
+
+    }
+
+  }
+
+  static parseAttributes(bindings: TemplateBindings, attributes: NamedNodeMap, path: number[]) {
+
+    for (let i = 0; i < attributes.length; i++) {
+
+      this.parseAttribute(bindings, attributes[i], path);
+
+    }
+
+  }
+
+  static parseAttribute(bindings: TemplateBindings, attribute: Attr, path: number[]) {
+
+    const match = attribute.value.match(this.BINDING_REGEX);
+    if (match) {
+
+      bindings.addAttributeBinding(match[1], attribute.name, path);
 
     }
 
@@ -96,9 +125,15 @@ export default class TemplateBindings {
 
   }
 
+  addAttributeBinding(name: string, attrName: string, path: number[]) {
+
+    this._attributeBindings.push({ name, attrName, path: path.slice() });
+
+  }
+
   applyTo(node: Node) {
 
-    const bindingsMap = new Map<string, Array<Node>>();
+    const bindingsMap = new Map<string, BoundNode[]>();
     for (let i = 0 ; i < this._textBindings.length; i++) {
 
       const { name, path } = this._textBindings[i]
@@ -110,7 +145,28 @@ export default class TemplateBindings {
 
       }
 
-      bindingsMap.get(name).push(nodeToBind);
+      bindingsMap.get(name).push({
+        node: nodeToBind
+      });
+
+    }
+
+    for (let i = 0 ; i < this._attributeBindings.length; i++) {
+
+      const { name, attrName, path } = this._attributeBindings[i]
+      const nodeToBind = this.findNodeFromPath(node, path);
+
+      if (!bindingsMap.has(name)) {
+
+        bindingsMap.set(name, []);
+
+      }
+
+      const attrNode = (<Element>nodeToBind).getAttributeNode(attrName);
+      bindingsMap.get(name).push({
+        node: attrNode,
+        originalValue: attrNode.value
+      });
 
     }
     return new Bindings(bindingsMap);

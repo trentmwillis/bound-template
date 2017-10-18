@@ -13,16 +13,16 @@
   <div id="qunit-fixture"></div>
 
   <template id="test-basic">
-    <p>Hello [[name]],</p>
+    <p class="[[class]]">Hello [[name]],</p>
 
-    <p>How are you doing <span>[[name]]</span>?</p>
+    <p class="[[class]] greeting">How are you doing <span>[[name]]</span>?</p>
 
     <div>
-      <span>Fare-thee-[[adjective]].</span>
+      <span title="Fare-thee-[[adjective]]">Fare-thee-[[adjective]].</span>
     </div>
   </template>
 
-  <script src="../dist/bound-template.min.js"></script>
+  <script src="../dist/bound-template.js"></script>
   <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
   <script>
     QUnit.module('BoundTemplate', function() {
@@ -34,10 +34,40 @@
           const template = new BoundTemplate(document.getElementById('test-basic'));
           const [instance, bindings] = template.create();
 
-          bindings.set('name', 'Trent');
+          bindings.set('name', 'Zelda');
           bindings.set('adjective', 'well');
 
-          assert.deepEqual(instance.textContent, `\n    Hello Trent,\n\n    How are you doing Trent?\n\n    \n      Fare-thee-well.\n    \n  `);
+          assert.deepEqual(instance.textContent, `\n    Hello Zelda,\n\n    How are you doing Zelda?\n\n    \n      Fare-thee-well.\n    \n  `);
+
+          bindings.set('name', 'Ganon');
+          bindings.set('adjective', 'poorly');
+
+          assert.deepEqual(instance.textContent, `\n    Hello Ganon,\n\n    How are you doing Ganon?\n\n    \n      Fare-thee-poorly.\n    \n  `);
+
+        });
+
+        QUnit.test('binds to attributes', function(assert) {
+
+          const template = new BoundTemplate(document.getElementById('test-basic'));
+          const [instance, bindings] = template.create();
+
+          bindings.set('adjective', 'well');
+          bindings.set('class', 'bold');
+
+          assert.equal(instance.querySelectorAll('.bold').length, 2);
+          assert.equal(instance.querySelectorAll('.bold.greeting').length, 1);
+          assert.equal(instance.querySelectorAll('[title="Fare-thee-well"]').length, 1);
+
+          bindings.set('adjective', 'poorly');
+          bindings.set('class', 'italic small');
+
+          assert.equal(instance.querySelectorAll('.bold').length, 0);
+          assert.equal(instance.querySelectorAll('.bold.greeting').length, 0);
+          assert.equal(instance.querySelectorAll('[title="Fare-thee-well"]').length, 0);
+
+          assert.equal(instance.querySelectorAll('.italic.small').length, 2);
+          assert.equal(instance.querySelectorAll('.italic.small.greeting').length, 1);
+          assert.equal(instance.querySelectorAll('[title="Fare-thee-poorly"]').length, 1);
 
         });
 

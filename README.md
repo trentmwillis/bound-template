@@ -1,29 +1,33 @@
 # BoundTemplate
 
-A micro-library for inserting data into an [HTML Template](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template) via named bindings.
+A micro-library for binding data to [HTML Templates](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template).
 
-## Example (API not finalized)
+## Goals
 
-```typescript
-class CustomElement extends HTMLElement {
+This library only aims to accomplish two things:
 
-  constructor() {
+1. Provide a simple method of binding _data_ to templates. This means no logic.
+2. Efficiently update bound data.
 
-    super();
+That's it. A future goal may be to provide a way to extend the library such that the "no logic" stance isn't always true.
 
-    const boundTemplate = new BoundTemplate(<HTMLTemplateElement>document.getElementById('#template'));
-    const [instance, bindings] = boundTemplate.create();
+## Example
 
-    this.templateBindings = bindings;
-    this.shadowRoot.appendChild(instance);
+```html
+<template id="greeting">
+  <p class="[[color]] greeting">Hello, [[name]]!</p>
+</template>
+```
 
-  }
+```javascript
+const template = document.getElementById('greeting');
+const boundTemplate = new BoundTemplate(template);
+const [instance, bindings] = boundTemplate.create();
 
-  attributeChangeCallback(name, oldValue, newValue) {
+// Insert template into DOM
+component.shadowRoot.appendChild(instance);
 
-    this.templateBindings.set(name, newValue);
-
-  }
-
-}
+// Update data in the DOM
+bindings.set('color', 'red');
+bindings.set('name', 'Zelda');
 ```

@@ -1,8 +1,10 @@
+import BoundNode from './bound-node';
+
 export default class Bindings {
 
-  _map: Map<string, Node[]>;
+  _map: Map<string, BoundNode[]>;
 
-  constructor(bindingsMap: Map<string, Node[]>) {
+  constructor(bindingsMap: Map<string, BoundNode[]>) {
 
     this._map = bindingsMap;
 
@@ -15,7 +17,17 @@ export default class Bindings {
 
       for (let i = 0; i < nodes.length; i++) {
 
-        nodes[i].textContent = value.toString();
+        const { node, originalValue } = nodes[i];
+        if (node.nodeType === Node.TEXT_NODE) {
+
+          node.textContent = value.toString();
+
+        } else {
+
+          (<Attr>node).value = originalValue.replace(`[[${name}]]`, value.toString());
+
+        }
+
 
       }
 
