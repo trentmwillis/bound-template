@@ -1,3 +1,5 @@
+import Bindings from './bindings';
+
 interface TextBinding {
   name: string;
   path: number[];
@@ -47,12 +49,6 @@ export default class TemplateBindings {
 
     if (node.nodeType === Node.ELEMENT_NODE) {
 
-      if (node.hasAttributes()) {
-
-        this.parseAttributes(bindings, node.attributes, path);
-
-      }
-
       if (node.hasChildNodes()) {
 
         this.parseNodes(bindings, node.childNodes, path);
@@ -75,7 +71,7 @@ export default class TemplateBindings {
       }
 
       if (node.length > match[0].length) {
-        node.splitText(match.index);
+        node.splitText(match[0].length);
       }
 
       const name = match[1];
@@ -84,46 +80,52 @@ export default class TemplateBindings {
 
   }
 
-  // Parses bindings from a set of attributes
-  static parseAttributes(bindings: TemplateBindings, attributes: NamedNodeMap, path: number[]) {
-    // TODO
-  }
-
-  // Parses bindings from an attribute. This is where info is actually added
-  // to the bindings data structure.
-  static parseAttribute(bindings: TemplateBindings, attribute, path: number[]) {
-    // TODO
-  }
-
   _textBindings: TextBinding[];
   _attributeBindings: AttributeBinding[];
 
+  constructor() {
+
+    this._textBindings = [];
+    this._attributeBindings = [];
+
+  }
+
   addTextBinding(name: string, path: number[]) {
-    this._textBindings.push({ name, path });
+
+    this._textBindings.push({ name, path: path.slice() });
+
   }
 
   applyTo(node: Node) {
 
+    const bindingsMap = new Map<string, Array<Node>>();
     for (let i = 0 ; i < this._textBindings.length; i++) {
 
-      const binding = this._textBindings[i]
-      this.applyTextBinding(binding, node);
+      const { name, path } = this._textBindings[i]
+      const nodeToBind = this.findNodeFromPath(node, path);
+
+      if (!bindingsMap.has(name)) {
+
+        bindingsMap.set(name, []);
+
+      }
+
+      bindingsMap.get(name).push(nodeToBind);
 
     }
-
-  }
-
-  applyTextBinding(binding: TextBinding, node: Node) {
-
-
+    return new Bindings(bindingsMap);
 
   }
 
   findNodeFromPath(node: Node, path: number[]) {
 
-  }
+    let result = node;
+    for (let i = 0; i < path.length; i++) {
 
-  addAttributeBinding() {
+      result = result.childNodes[path[i]];
+
+    }
+    return result;
 
   }
 

@@ -1,0 +1,49 @@
+!<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+
+  <title>BoundTemplate Tests</title>
+
+  <link rel="stylesheet" href="../node_modules/qunitjs/qunit/qunit.css">
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+
+  <template id="test-basic">
+    <p>Hello [[name]],</p>
+
+    <p>How are you doing <span>[[name]]</span>?</p>
+
+    <div>
+      <span>Fare-thee-[[adjective]].</span>
+    </div>
+  </template>
+
+  <script src="../dist/bound-template.min.js"></script>
+  <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
+  <script>
+    QUnit.module('BoundTemplate', function() {
+
+      QUnit.module('create', function() {
+
+        QUnit.test('returns a template instance and a bindings object that syncs to the DOM', function(assert) {
+
+          const template = new BoundTemplate(document.getElementById('test-basic'));
+          const [instance, bindings] = template.create();
+
+          bindings.set('name', 'Trent');
+          bindings.set('adjective', 'well');
+
+          assert.deepEqual(instance.textContent, `\n    Hello Trent,\n\n    How are you doing Trent?\n\n    \n      Fare-thee-well.\n    \n  `);
+
+        });
+
+      });
+
+    });
+  </script>
+</body>
+</html>

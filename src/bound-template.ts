@@ -12,17 +12,11 @@ export default class BoundTemplate {
 
   }
 
-  create(): [Node, Bindings] {
+  create() {
 
-    const instance = this.template.cloneNode(true);
-    const bindings = this._initBindings(instance);
+    const instance = this.template.content.cloneNode(true);
+    const bindings = this.bindings.applyTo(instance);
     return [instance, bindings];
-
-  }
-
-  _initBindings(node: Node) {
-
-    return this.bindings.applyTo(node);
 
   }
 
