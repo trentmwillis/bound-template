@@ -139,6 +139,8 @@ export default class TemplateBindings {
       const { name, path } = this._textBindings[i]
       const nodeToBind = this.findNodeFromPath(node, path);
 
+      nodeToBind.textContent = '';
+
       if (!bindingsMap.has(name)) {
 
         bindingsMap.set(name, []);
@@ -167,6 +169,7 @@ export default class TemplateBindings {
         node: attrNode,
         originalValue: attrNode.value
       });
+      attrNode.value = attrNode.value.replace(`[[${name}]]`, '');
 
     }
     return new Bindings(bindingsMap);

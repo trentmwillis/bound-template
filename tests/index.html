@@ -34,6 +34,8 @@
           const template = new BoundTemplate(document.getElementById('test-basic'));
           const [instance, bindings] = template.create();
 
+          assert.deepEqual(instance.textContent, `\n    Hello ,\n\n    How are you doing ?\n\n    \n      Fare-thee-.\n    \n  `);
+
           bindings.set('name', 'Zelda');
           bindings.set('adjective', 'well');
 
@@ -51,12 +53,20 @@
           const template = new BoundTemplate(document.getElementById('test-basic'));
           const [instance, bindings] = template.create();
 
+          const simple = instance.querySelector('p');
+          const greeting = instance.querySelector('.greeting');
+          const farewell = instance.querySelector('span[title]');
+
+          assert.notOk(simple.classList.contains('bold'));
+          assert.notOk(greeting.classList.contains('bold'));
+          assert.equal(farewell.getAttribute('title'), 'Fare-thee-');
+
           bindings.set('adjective', 'well');
           bindings.set('class', 'bold');
 
-          assert.equal(instance.querySelectorAll('.bold').length, 2);
-          assert.equal(instance.querySelectorAll('.bold.greeting').length, 1);
-          assert.equal(instance.querySelectorAll('[title="Fare-thee-well"]').length, 1);
+          assert.ok(simple.classList.contains('bold'));
+          assert.ok(greeting.classList.contains('bold'));
+          assert.equal(farewell.getAttribute('title'), 'Fare-thee-well');
 
           bindings.set('adjective', 'poorly');
           bindings.set('class', 'italic small');
