@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+
+  <title>Custom Element Example</title>
+
+  <link rel="stylesheet" href="../node_modules/qunitjs/qunit/qunit.css">
+</head>
+<body>
+
+  <hello-name></hello-name>
+
+  <template id="hello-name-template">
+    <style>
+      .red {
+        color: red;
+      }
+
+      .blue {
+        color: blue;
+      }
+    </style>
+    <p class="[[color]] greeting">Hello, [[name]]!</p>
+  </template>
+
+  <script src="../dist/bound-template.js"></script>
+  <script>
+    class BoundElement extends HTMLElement {
+      __getBoundTemplate() {
+
+        if (!this.__boundTemplate) {
+          const rawTemplate = document.getElementById(`${this.constructor.is}-template`);
+          this.__boundTemplate = new BoundTemplate(rawTemplate);
+        }
+
+        return this.__boundTemplate;
+
+      }
+
+      constructor() {
+        super();
+
+        const [template, props] = this.__getBoundTemplate().create();
+
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.appendChild(template);
+
+        this.props = new Proxy({}, {
+          set(target, prop, value) {
+            props.set(prop, value);
+
+            return Reflect.set(...arguments);
+          }
+        });
+      }
+    }
+  </script>
+
+  <script>
+    class HelloName extends BoundElement {
+      static get is() {
+        return 'hello-name';
+      }
+
+      constructor() {
+        super();
+
+        this.props.name = 'Trent';
+        console.log(this.props.name);
+
+        this.props.color = 'red';
+        console.log(this.props.color);
+
+        this.props.notInTemplate = 'should not do anything';
+        console.log(this.props.notInTemplate);
+      }
+    }
+
+    customElements.define(HelloName.is, HelloName);
+  </script>
+</body>
+</html>

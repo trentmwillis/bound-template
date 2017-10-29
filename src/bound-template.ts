@@ -1,3 +1,5 @@
+import TemplateBindingsFactory from './template-bindings-factory';
+import TemplateBindingsParser from './template-bindings-parser';
 import TemplateBindings from './template-bindings';
 
 /**
@@ -7,12 +9,12 @@ import TemplateBindings from './template-bindings';
  */
 export default class BoundTemplate {
 
-  _bindings: TemplateBindings;
+  _bindingsFactory: TemplateBindingsFactory;
   _template: HTMLTemplateElement;
 
   constructor(template: HTMLTemplateElement) {
 
-    this._bindings = null;
+    this._bindingsFactory = null;
     this._template = template;
 
   }
@@ -22,16 +24,16 @@ export default class BoundTemplate {
    * first instance created, it will also perform the initial parse of the
    * template.
    */
-  create() {
+  create(): [Node, TemplateBindings] {
 
-    if (!this._bindings) {
+    if (!this._bindingsFactory) {
 
-      this._bindings = TemplateBindings.parse(this._template);
+      this._bindingsFactory = TemplateBindingsParser.parse(this._template);
 
     }
 
     const instance = this._template.content.cloneNode(true);
-    const bindings = this._bindings.applyTo(instance);
+    const bindings = this._bindingsFactory.applyTo(instance);
 
     return [instance, bindings];
 
