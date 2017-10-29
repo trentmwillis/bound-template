@@ -17,14 +17,21 @@ export default class Bindings {
 
       for (let i = 0; i < nodes.length; i++) {
 
-        const { node, originalValue } = nodes[i];
+        const { node, originalValue, values } = nodes[i];
         if (node.nodeType === Node.TEXT_NODE) {
 
           node.textContent = value.toString();
 
         } else {
 
-          (<Attr>node).value = originalValue.replace(`[[${name}]]`, value.toString());
+          values.set(name, value.toString());
+
+          let attrValue = originalValue;
+          for (let [name, value] of values) {
+            attrValue = attrValue.replace(`[[${name}]]`, value);
+          }
+
+          (<Attr>node).value = attrValue;
 
         }
 

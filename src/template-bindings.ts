@@ -7,14 +7,14 @@ interface TextBinding {
 }
 
 interface AttributeBinding {
-  name: string;
+  names: string[];
   attrName: string;
   path: number[];
 }
 
 export default class TemplateBindings {
 
-  static BINDING_REGEX = /\[\[([a-z]*)\]\]/;
+  static BINDING_REGEX = /\[\[([a-z0-9]*)\]\]/;
 
   // Generates template binding info from the provide HTML Template
   static parse(template: HTMLTemplateElement) {
@@ -79,10 +79,21 @@ export default class TemplateBindings {
 
   static parseAttribute(bindings: TemplateBindings, attribute: Attr, path: number[]) {
 
-    const match = attribute.value.match(this.BINDING_REGEX);
-    if (match) {
+    const regex = new RegExp(this.BINDING_REGEX.source, 'g');
+    const names: string[] = [];
+    let match: RegExpMatchArray;
+    while (match = regex.exec(attribute.value)) {
 
-      bindings.addAttributeBinding(match[1], attribute.name, path);
+      names.push(match[1]);
+
+    }
+
+    if (names.length) {
+
+      // TODO: Check if property bindings
+      // TODO: Check if event handler bindings
+
+      bindings.addAttributeBinding(names, attribute.name, path);
 
     }
 
@@ -92,7 +103,8 @@ export default class TemplateBindings {
   // to the bindings data structure
   static parseBindings(bindings: TemplateBindings, node: Text, path: number[]) {
 
-    const match = node.textContent.match(this.BINDING_REGEX);
+    const regex = new RegExp(this.BINDING_REGEX.source, 'g');
+    const match = regex.exec(node.textContent);
     if (match) {
       if (match.index) {
         node.splitText(match.index);
@@ -125,9 +137,9 @@ export default class TemplateBindings {
 
   }
 
-  addAttributeBinding(name: string, attrName: string, path: number[]) {
+  addAttributeBinding(names: string[], attrName: string, path: number[]) {
 
-    this._attributeBindings.push({ name, attrName, path: path.slice() });
+    this._attributeBindings.push({ names, attrName, path: path.slice() });
 
   }
 
@@ -155,21 +167,35 @@ export default class TemplateBindings {
 
     for (let i = 0 ; i < this._attributeBindings.length; i++) {
 
-      const { name, attrName, path } = this._attributeBindings[i]
+      const { names, attrName, path } = this._attributeBindings[i]
       const nodeToBind = this.findNodeFromPath(node, path);
+      const attrNode = (<Element>nodeToBind).getAttributeNode(attrName);
+      const binding = {
+        node: attrNode,
+        originalValue: attrNode.value,
+        values: new Map<string, string>()
+      };
 
-      if (!bindingsMap.has(name)) {
+      for (let j = 0; j < names.length; j++) {
 
-        bindingsMap.set(name, []);
+        const name = names[j];
+        if (!bindingsMap.has(name)) {
+
+          bindingsMap.set(name, []);
+
+        }
+
+        binding.values.set(name, '');
+        bindingsMap.get(name).push(binding);
 
       }
 
-      const attrNode = (<Element>nodeToBind).getAttributeNode(attrName);
-      bindingsMap.get(name).push({
-        node: attrNode,
-        originalValue: attrNode.value
-      });
-      attrNode.value = attrNode.value.replace(`[[${name}]]`, '');
+      let attrValue = binding.originalValue;
+      for (let [name, value] of binding.values) {
+        attrValue = attrValue.replace(`[[${name}]]`, value);
+      }
+
+      attrNode.value = attrValue;
 
     }
     return new Bindings(bindingsMap);

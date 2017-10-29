@@ -13,9 +13,9 @@
   <div id="qunit-fixture"></div>
 
   <template id="test-basic">
-    <p class="[[class]]">Hello [[name]],</p>
+    <p class="[[class]] [[class2]]" name=[[name]]>Hello [[name]][[suffix]],</p>
 
-    <p class="[[class]] greeting">How are you doing <span>[[name]]</span>?</p>
+    <p class="[[class]] [[class2]] greeting">How are you doing <span>[[name]][[suffix]]</span>?</p>
 
     <div>
       <span title="Fare-thee-[[adjective]]">Fare-thee-[[adjective]].</span>
@@ -38,11 +38,13 @@
 
           bindings.set('name', 'Zelda');
           bindings.set('adjective', 'well');
+          bindings.set('suffix', '-san');
 
-          assert.deepEqual(instance.textContent, `\n    Hello Zelda,\n\n    How are you doing Zelda?\n\n    \n      Fare-thee-well.\n    \n  `);
+          assert.deepEqual(instance.textContent, `\n    Hello Zelda-san,\n\n    How are you doing Zelda-san?\n\n    \n      Fare-thee-well.\n    \n  `);
 
           bindings.set('name', 'Ganon');
           bindings.set('adjective', 'poorly');
+          bindings.set('suffix', '');
 
           assert.deepEqual(instance.textContent, `\n    Hello Ganon,\n\n    How are you doing Ganon?\n\n    \n      Fare-thee-poorly.\n    \n  `);
 
@@ -63,9 +65,12 @@
 
           bindings.set('adjective', 'well');
           bindings.set('class', 'bold');
+          bindings.set('class2', 'large');
 
           assert.ok(simple.classList.contains('bold'));
+          assert.ok(simple.classList.contains('large'));
           assert.ok(greeting.classList.contains('bold'));
+          assert.ok(greeting.classList.contains('large'));
           assert.equal(farewell.getAttribute('title'), 'Fare-thee-well');
 
           bindings.set('adjective', 'poorly');
