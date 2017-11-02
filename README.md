@@ -14,11 +14,11 @@ That's it. The goals may change in the future, but for now the overarching theme
 
 ## Syntax
 
-The syntax to bind a value to the DOM is simple: `[[name]]`. You can bind to attributes as well as text.
+The syntax to bind a value to the DOM is simple: `{{name}}`. You can bind to attributes as well as text.
 
 ```html
 <template id="greeting">
-  <p class="[[color]] greeting">Hello, [[name]]!</p>
+  <p class="{{color}} greeting">Hello, {{name}}!</p>
 </template>
 ```
 
@@ -26,14 +26,14 @@ You can bind multiple values as well:
 
 ```html
 <template id="greeting">
-  <p class="[[color]] [[type]]">[[greeting]], [[name]]!</p>
+  <p class="{{color}} {{type}}">{{greeting}}, {{name}}!</p>
 </template>
 ```
 
 You can also bind to properties by appending `$` to an attribute name:
 
 ```html
-<p my-prop$=[[data]]></p>
+<p my-prop$={{data}}></p>
 ```
 
 This makes it obvious that the value will be applied to a property and not an attribute. Note that you cannot apply more than one binding to a property. If more than one is specified, the subsequent bindings will be ignored.
@@ -43,7 +43,7 @@ The primary difference between attributes and properties is that attribute value
 You can also bind event handlers using the `on-` prefix:
 
 ```html
-<p on-click=[[clickHandler]]></p>
+<p on-click={{clickHandler}}></p>
 ```
 
 Anytime the binding for an event handler is updated, the old handler will be removed and the new one attached. If a non-function value is passed, an error will occur.

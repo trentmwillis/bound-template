@@ -40,7 +40,7 @@ export default class TemplateBindings {
 
           let attrValue = originalValue;
           for (let [name, value] of values) {
-            attrValue = attrValue.replace(`[[${name}]]`, value);
+            attrValue = attrValue.replace(`{{${name}}}`, value);
           }
 
           (<Attr>node).value = attrValue;

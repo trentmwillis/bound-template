@@ -7,7 +7,7 @@ import TemplateBindingsFactory from './template-bindings-factory';
  */
 export default class TemplateBindingsParser {
 
-  static BINDING_REGEX = /\[\[([a-zA-z0-9]*)\]\]/;
+  static BINDING_REGEX = /{{([a-zA-z0-9]*)}}/;
 
   static parse(template: HTMLTemplateElement) {
 

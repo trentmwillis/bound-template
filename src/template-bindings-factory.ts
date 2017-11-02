@@ -121,7 +121,7 @@ export default class TemplateBindingsFactory {
 
           let attrValue = binding.originalValue;
           for (let [name, value] of binding.values) {
-            attrValue = attrValue.replace(`[[${name}]]`, value);
+            attrValue = attrValue.replace(`{{${name}}}`, value);
           }
 
           attrNode.value = attrValue;
