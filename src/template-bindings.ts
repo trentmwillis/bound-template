@@ -26,12 +26,16 @@ export default class TemplateBindings {
 
           node.textContent = value.toString();
 
-        } else if (boundNode.hasOwnProperty('eventHandler')) {
+        } else if (boundNode.eventName) {
 
           const { eventHandler, eventName } = <BoundEventHandlerNode>boundNode;
           node.removeEventListener(eventName, eventHandler);
           node.addEventListener(eventName, value);
           (<BoundEventHandlerNode>boundNode).eventHandler = value;
+
+        } else if (boundNode.propName) {
+
+          node.props[boundNode.propName] = value;
 
         } else {
 

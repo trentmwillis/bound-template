@@ -7,6 +7,10 @@ export interface BoundAttributeNode extends BoundNode {
   values: Map<string, string>;
 }
 
+export interface BoundPropertyNode extends BoundNode {
+  propName: string;
+}
+
 export interface BoundEventHandlerNode extends BoundNode {
   eventName: string;
   eventHandler: (event: Event) => void;

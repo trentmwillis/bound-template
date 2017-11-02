@@ -22,7 +22,7 @@
         color: blue;
       }
     </style>
-    <p class="{{color}} greeting" on-click="{{onClick}}">Hello, {{name}}!</p>
+    <p class="{{color}} greeting" on-click="{{onClick}}" myProp$={{myProp}}>Hello, {{name}}!</p>
   </template>
 
   <script src="../dist/bound-template.js"></script>
@@ -82,6 +82,9 @@
         this.props.onClick = function() {
           console.log('clicked! 2');
         };
+
+        this.props.myProp = 'foo';
+        console.log(this.props.myProp);
       }
     }
 
