@@ -1,5 +1,5 @@
 import TemplateBindings from './template-bindings';
-import BoundNode from './bound-node';
+import BoundNode, { BoundAttributeNode, BoundEventHandlerNode } from './bound-node';
 
 interface Binding {
   path: number[];
@@ -12,6 +12,7 @@ interface TextBinding extends Binding {
 interface AttributeBinding extends Binding {
   names: string[];
   attrName: string;
+  eventName: string;
 }
 
 /**
@@ -39,7 +40,14 @@ export default class TemplateBindingsFactory {
 
   addAttributeBinding(names: string[], attrName: string, path: number[]) {
 
-    this._attributeBindings.push({ names, attrName, path: path.slice() });
+    const eventName = attrName.startsWith('on-') ? attrName.substr(3) : '';
+
+    this._attributeBindings.push({
+      names,
+      attrName,
+      eventName,
+      path: path.slice()
+    });
 
   }
 
@@ -67,35 +75,58 @@ export default class TemplateBindingsFactory {
 
     for (let i = 0 ; i < this._attributeBindings.length; i++) {
 
-      const { names, attrName, path } = this._attributeBindings[i]
+      const { names, attrName, path, eventName } = this._attributeBindings[i]
       const nodeToBind = this.findNodeFromPath(node, path);
       const attrNode = (<Element>nodeToBind).getAttributeNode(attrName);
-      const binding = {
-        node: attrNode,
-        originalValue: attrNode.value,
-        values: new Map<string, string>()
-      };
 
-      for (let j = 0; j < names.length; j++) {
+      if (eventName) {
 
-        const name = names[j];
-        if (!bindingsMap.has(name)) {
+        const node = attrNode.ownerElement;
+        const binding: BoundEventHandlerNode = {
+          node,
+          eventName,
+          eventHandler: null
+        };
 
-          bindingsMap.set(name, []);
+        node.removeAttribute(attrNode.name);
+        if (!bindingsMap.has(names[0])) {
+
+          bindingsMap.set(names[0], []);
 
         }
 
-        binding.values.set(name, '');
-        bindingsMap.get(name).push(binding);
+        bindingsMap.get(names[0]).push(binding);
+
+      } else {
+
+          const binding: BoundAttributeNode = {
+            node: attrNode,
+            originalValue: attrNode.value,
+            values: new Map<string, string>()
+          };
+
+          for (let j = 0; j < names.length; j++) {
+
+            const name = names[j];
+            if (!bindingsMap.has(name)) {
+
+              bindingsMap.set(name, []);
+
+            }
+
+            binding.values.set(name, '');
+            bindingsMap.get(name).push(binding);
+
+          }
+
+          let attrValue = binding.originalValue;
+          for (let [name, value] of binding.values) {
+            attrValue = attrValue.replace(`[[${name}]]`, value);
+          }
+
+          attrNode.value = attrValue;
 
       }
-
-      let attrValue = binding.originalValue;
-      for (let [name, value] of binding.values) {
-        attrValue = attrValue.replace(`[[${name}]]`, value);
-      }
-
-      attrNode.value = attrValue;
 
     }
     return new TemplateBindings(bindingsMap);

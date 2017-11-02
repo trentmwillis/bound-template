@@ -1,7 +1,13 @@
-interface BoundNode {
+export default interface BoundNode {
   node: Node;
-  originalValue?: string,
-  values?: Map<string, string>
 }
 
-export default BoundNode;
+export interface BoundAttributeNode extends BoundNode {
+  originalValue: string;
+  values: Map<string, string>;
+}
+
+export interface BoundEventHandlerNode extends BoundNode {
+  eventName: string;
+  eventHandler: (event: Event) => void;
+}

@@ -7,7 +7,7 @@ import TemplateBindingsFactory from './template-bindings-factory';
  */
 export default class TemplateBindingsParser {
 
-  static BINDING_REGEX = /\[\[([a-z0-9]*)\]\]/;
+  static BINDING_REGEX = /\[\[([a-zA-z0-9]*)\]\]/;
 
   static parse(template: HTMLTemplateElement) {
 
@@ -85,9 +85,6 @@ export default class TemplateBindingsParser {
     }
 
     if (names.length) {
-
-      // TODO: Check if property bindings
-      // TODO: Check if event handler bindings
 
       bindings.addAttributeBinding(names, attribute.name, path);
 

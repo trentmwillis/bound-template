@@ -81,5 +81,3 @@ For further examples, see the [`Examples` folder](./examples).
 ## Version 1.0 Todo
 - Property bindings
   - Property bindings should always be put on `.props` to avoid collisions (is this React standard as well?). This will also make it easy to do nested bindings in Custom Elements.
-- Event handler bindings
-- Handle nested templates

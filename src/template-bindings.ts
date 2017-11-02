@@ -1,4 +1,4 @@
-import BoundNode from './bound-node';
+import BoundNode, { BoundAttributeNode, BoundEventHandlerNode } from './bound-node';
 
 /**
  * Provides a simple interface for directly inserting data into a template.
@@ -15,18 +15,27 @@ export default class TemplateBindings {
 
   set(name, value) {
 
-    const nodes = this._map.get(name);
-    if (nodes) {
+    const boundNodes = this._map.get(name);
+    if (boundNodes) {
 
-      for (let i = 0; i < nodes.length; i++) {
+      for (let i = 0; i < boundNodes.length; i++) {
 
-        const { node, originalValue, values } = nodes[i];
+        const boundNode = boundNodes[i];
+        const { node } = boundNode;
         if (node.nodeType === Node.TEXT_NODE) {
 
           node.textContent = value.toString();
 
+        } else if (boundNode.hasOwnProperty('eventHandler')) {
+
+          const { eventHandler, eventName } = <BoundEventHandlerNode>boundNode;
+          node.removeEventListener(eventName, eventHandler);
+          node.addEventListener(eventName, value);
+          (<BoundEventHandlerNode>boundNode).eventHandler = value;
+
         } else {
 
+          const { values, originalValue } = <BoundAttributeNode>boundNode;
           values.set(name, value.toString());
 
           let attrValue = originalValue;

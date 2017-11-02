@@ -22,7 +22,7 @@
         color: blue;
       }
     </style>
-    <p class="[[color]] greeting">Hello, [[name]]!</p>
+    <p class="[[color]] greeting" on-click="[[onClick]]">Hello, [[name]]!</p>
   </template>
 
   <script src="../dist/bound-template.js"></script>
@@ -75,6 +75,13 @@
 
         this.props.notInTemplate = 'should not do anything';
         console.log(this.props.notInTemplate);
+
+        this.props.onClick = function() {
+          console.log('clicked!');
+        };
+        this.props.onClick = function() {
+          console.log('clicked! 2');
+        };
       }
     }
 
