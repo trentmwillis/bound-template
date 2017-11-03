@@ -24,7 +24,7 @@ export default class BoundTemplate {
    * first instance created, it will also perform the initial parse of the
    * template.
    */
-  create(): [Node, TemplateBindings] {
+  create(data?: object): [Node, TemplateBindings] {
 
     if (!this._bindingsFactory) {
 
@@ -34,6 +34,12 @@ export default class BoundTemplate {
 
     const instance = this._template.content.cloneNode(true);
     const bindings = this._bindingsFactory.applyTo(instance);
+
+    if (data) {
+
+      bindings.setData(data);
+
+    }
 
     return [instance, bindings];
 

@@ -25,7 +25,13 @@ export default class TemplateBindings {
 
   }
 
-  set(name, value) {
+  setData(data: object) {
+
+    Object.keys(data).forEach(key => this.set(key, data[key]));
+
+  }
+
+  set(name: string, value: any) {
 
     const boundNodes = this._map.get(name);
     if (boundNodes) {
