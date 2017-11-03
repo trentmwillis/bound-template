@@ -8,24 +8,12 @@
 
   <link rel="stylesheet" href="../node_modules/qunitjs/qunit/qunit.css">
 </head>
+
 <body>
-
-  <hello-name></hello-name>
-
-  <template id="hello-name-template">
-    <style>
-      .red {
-        color: red;
-      }
-
-      .blue {
-        color: blue;
-      }
-    </style>
-    <p class="{{color}} greeting" on-click="{{onClick}}" myProp$={{myProp}}>Hello, {{name}}!</p>
-  </template>
+  <name-input></name-input>
 
   <script src="../dist/bound-template.js"></script>
+
   <script>
     class BoundElement extends HTMLElement {
       __getBoundTemplate() {
@@ -58,6 +46,45 @@
     }
   </script>
 
+  <template id="name-input-template">
+    <hello-name name$={{name}}></hello-name>
+    <input type="text" placeholder="Name" on-input={{changeName}}>
+  </template>
+
+  <script>
+    class NameInput extends BoundElement {
+      static get is() {
+        return 'name-input';
+      }
+
+      constructor() {
+        super();
+
+        this.props.changeName = (e) => {
+
+          this.props.name = e.target.value || 'Someone';
+
+        };
+      }
+    }
+
+    customElements.define(NameInput.is, NameInput);
+  </script>
+
+  <template id="hello-name-template">
+    <style>
+      .red {
+        color: red;
+      }
+
+      .blue {
+        color: blue;
+      }
+    </style>
+    <p class="{{color}} greeting">Hello, {{name}}!</p>
+    <input type="checkbox" on-change={{toggleColor}}>
+  </template>
+
   <script>
     class HelloName extends BoundElement {
       static get is() {
@@ -67,24 +94,13 @@
       constructor() {
         super();
 
-        this.props.name = 'Trent';
-        console.log(this.props.name);
+        this.props.name = 'Someone';
+        this.props.color = 'blue';
+        this.props.toggleColor = () => {
 
-        this.props.color = 'red';
-        console.log(this.props.color);
+          this.props.color = this.props.color === 'red' ? 'blue' : 'red';
 
-        this.props.notInTemplate = 'should not do anything';
-        console.log(this.props.notInTemplate);
-
-        this.props.onClick = function() {
-          console.log('clicked!');
         };
-        this.props.onClick = function() {
-          console.log('clicked! 2');
-        };
-
-        this.props.myProp = 'foo';
-        console.log(this.props.myProp);
       }
     }
 
