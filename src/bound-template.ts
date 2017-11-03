@@ -1,6 +1,6 @@
+import TemplateBindings from './template-bindings';
 import TemplateBindingsFactory from './template-bindings-factory';
 import TemplateBindingsParser from './template-bindings-parser';
-import TemplateBindings from './template-bindings';
 
 /**
  * The only public export of the package. This class turns a standard HTML

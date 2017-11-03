@@ -7,6 +7,7 @@
     "build": "rollup -c rollup.config.js",
     "build:minify": "uglifyjs dist/bound-template.js -mc -o dist/bound-template.min.js",
     "build:watch": "rollup -c rollup.config.js --watch",
+    "lint": "tslint --project ./",
     "size": "uglifyjs dist/bound-template.js -mc | gzip -9 | wc -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,6 +25,7 @@
     "qunitjs": "^2.4.0",
     "rollup": "^0.50.0",
     "rollup-plugin-typescript": "^0.8.1",
+    "tslint": "^5.8.0",
     "typescript": "^2.5.3",
     "uglify-es": "^3.1.3"
   }

@@ -1,9 +1,9 @@
-import TemplateBindings from './template-bindings';
 import BoundNode, {
   BoundAttributeNode,
-  BoundPropertyNode,
-  BoundEventHandlerNode
+  BoundEventHandlerNode,
+  BoundPropertyNode
 } from './bound-node';
+import TemplateBindings from './template-bindings';
 
 interface Binding {
   path: number[];
@@ -18,12 +18,6 @@ interface AttributeBinding extends Binding {
   attrName: string;
   eventName: string;
   isProperty: boolean;
-}
-
-declare global {
-  interface Element {
-    props: object;
-  }
 }
 
 /**
@@ -67,9 +61,8 @@ export default class TemplateBindingsFactory {
   applyTo(node: Node) {
 
     const bindingsMap = new Map<string, BoundNode[]>();
-    for (let i = 0 ; i < this._textBindings.length; i++) {
+    for (let { name, path } of this._textBindings) {
 
-      const { name, path } = this._textBindings[i]
       const nodeToBind = this.findNodeFromPath(node, path);
 
       nodeToBind.textContent = '';
@@ -86,22 +79,21 @@ export default class TemplateBindingsFactory {
 
     }
 
-    for (let i = 0 ; i < this._attributeBindings.length; i++) {
+    for (let { names, attrName, path, eventName, isProperty } of this._attributeBindings) {
 
-      const { names, attrName, path, eventName, isProperty } = this._attributeBindings[i]
       const nodeToBind = this.findNodeFromPath(node, path);
-      const attrNode = (<Element>nodeToBind).getAttributeNode(attrName);
+      const attrNode = (nodeToBind as Element).getAttributeNode(attrName);
 
       if (eventName) {
 
-        const node = attrNode.ownerElement;
+        const ownerElement = attrNode.ownerElement;
         const binding: BoundEventHandlerNode = {
-          node,
+          node: ownerElement,
           eventName,
           eventHandler: null
         };
 
-        node.removeAttribute(attrNode.name);
+        ownerElement.removeAttribute(attrNode.name);
         if (!bindingsMap.has(names[0])) {
 
           bindingsMap.set(names[0], []);
@@ -112,16 +104,16 @@ export default class TemplateBindingsFactory {
 
       } else if (isProperty) {
 
-        const node = attrNode.ownerElement;
+        const ownerElement = attrNode.ownerElement;
         const propName = attrNode.name.slice(0, -1);
         const binding: BoundPropertyNode = {
-          node,
+          node: ownerElement,
           propName
         };
 
-        node.props = node.props || {};
-        node.props[propName] = null;
-        node.removeAttribute(attrNode.name);
+        ownerElement.props = ownerElement.props || {};
+        ownerElement.props[propName] = null;
+        ownerElement.removeAttribute(attrNode.name);
         if (!bindingsMap.has(names[0])) {
 
           bindingsMap.set(names[0], []);
@@ -138,9 +130,8 @@ export default class TemplateBindingsFactory {
             values: new Map<string, string>()
           };
 
-          for (let j = 0; j < names.length; j++) {
+          for (let name of names) {
 
-            const name = names[j];
             if (!bindingsMap.has(name)) {
 
               bindingsMap.set(name, []);
@@ -169,9 +160,9 @@ export default class TemplateBindingsFactory {
   findNodeFromPath(node: Node, path: number[]) {
 
     let result = node;
-    for (let i = 0; i < path.length; i++) {
+    for (let pathSegment of path) {
 
-      result = result.childNodes[path[i]];
+      result = result.childNodes[pathSegment];
 
     }
     return result;

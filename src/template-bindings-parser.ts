@@ -39,7 +39,7 @@ export default class TemplateBindingsParser {
 
     if (node.nodeType === Node.TEXT_NODE) {
 
-      return this.parseTextBindings(bindings, <Text>node, path);
+      return this.parseTextBindings(bindings, node as Text, path);
 
     }
 
@@ -64,6 +64,7 @@ export default class TemplateBindingsParser {
   // Parses the attributes of a node to see if they have any template bindings
   static parseAttributes(bindings: TemplateBindingsFactory, attributes: NamedNodeMap, path: number[]) {
 
+    // tslint:disable-next-line prefer-for-of
     for (let i = 0; i < attributes.length; i++) {
 
       this.parseAttribute(bindings, attributes[i], path);
@@ -77,10 +78,11 @@ export default class TemplateBindingsParser {
 
     const regex = new RegExp(this.BINDING_REGEX.source, 'g');
     const names: string[] = [];
-    let match: RegExpMatchArray;
-    while (match = regex.exec(attribute.value)) {
+    let match: RegExpMatchArray = regex.exec(attribute.value);
+    while (match) {
 
       names.push(match[1]);
+      match = regex.exec(attribute.value);
 
     }
 

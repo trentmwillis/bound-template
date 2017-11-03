@@ -1,4 +1,16 @@
-import BoundNode, { BoundAttributeNode, BoundEventHandlerNode } from './bound-node';
+import BoundNode, {
+  BoundAttributeNode,
+  BoundEventHandlerNode,
+  BoundPropertyNode
+} from './bound-node';
+
+function isBoundEventHandlerNode(node: BoundNode): node is BoundEventHandlerNode {
+  return node.hasOwnProperty('eventName');
+}
+
+function isBoundPropertyNode(node: BoundNode): node is BoundPropertyNode {
+  return node.hasOwnProperty('propName');
+}
 
 /**
  * Provides a simple interface for directly inserting data into a template.
@@ -18,39 +30,37 @@ export default class TemplateBindings {
     const boundNodes = this._map.get(name);
     if (boundNodes) {
 
-      for (let i = 0; i < boundNodes.length; i++) {
+      for (let boundNode of boundNodes) {
 
-        const boundNode = boundNodes[i];
         const { node } = boundNode;
         if (node.nodeType === Node.TEXT_NODE) {
 
           node.textContent = value.toString();
 
-        } else if (boundNode.eventName) {
+        } else if (isBoundEventHandlerNode(boundNode)) {
 
-          const { eventHandler, eventName } = <BoundEventHandlerNode>boundNode;
+          const { eventHandler, eventName } = boundNode;
           node.removeEventListener(eventName, eventHandler);
           node.addEventListener(eventName, value);
-          (<BoundEventHandlerNode>boundNode).eventHandler = value;
+          boundNode.eventHandler = value;
 
-        } else if (boundNode.propName) {
+        } else if (isBoundPropertyNode(boundNode)) {
 
-          node.props[boundNode.propName] = value;
+          (node as Element).props[boundNode.propName] = value;
 
         } else {
 
-          const { values, originalValue } = <BoundAttributeNode>boundNode;
+          const { values, originalValue } = boundNode as BoundAttributeNode;
           values.set(name, value.toString());
 
           let attrValue = originalValue;
-          for (let [name, value] of values) {
-            attrValue = attrValue.replace(`{{${name}}}`, value);
+          for (let [k, v] of values) {
+            attrValue = attrValue.replace(`{{${k}}}`, v);
           }
 
-          (<Attr>node).value = attrValue;
+          (node as Attr).value = attrValue;
 
         }
-
 
       }
 
