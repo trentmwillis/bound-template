@@ -91,10 +91,10 @@ const [instance, bindings] = boundTemplate.create({
 });
 ```
 
-Similarly, you can set multiple values at a time by passing an object to the `set` function:
+Similarly, you can set multiple values at a time by passing an object to the `setData` function:
 
 ```javascript
-bindings.set({
+bindings.setData({
   color: 'red',
   name: 'Zelda'
 });

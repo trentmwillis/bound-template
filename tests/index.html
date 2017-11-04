@@ -1,4 +1,4 @@
-!<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -12,77 +12,530 @@
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>
 
-  <template id="test-basic">
-    <p class="{{class}} {{class2}}" name={{name}}>Hello {{name}}{{suffix}},</p>
+  <section id="text-bindings">
+    <template id="test-text">
+      {{name}}
+    </template>
 
-    <p class="{{class}} {{class2}} greeting">How are you doing <span>{{name}}{{suffix}}</span>?</p>
+    <template id="test-text-nested">
+      <div>
+        <p>
+          <a>{{name}}</a>
+        </p>
+      </div>
+    </template>
 
-    <div>
-      <span title="Fare-thee-{{adjective}}">Fare-thee-{{adjective}}.</span>
-    </div>
-  </template>
+    <template id="test-text-adjacent">
+        <p>{{firstName}}{{lastName}}</p>
+    </template>
+
+    <template id="test-text-multiple">
+        <ul>
+          <li>{{name}}</li>
+          <li>{{name}}</li>
+        </ul>
+    </template>
+  </section>
+
+  <section id="attribute-bindings">
+    <template id="test-attribute">
+      <span class="{{class}}"></span>
+    </template>
+
+    <template id="test-attribute-nested">
+      <section>
+        <div>
+          <span class="{{class}}"></span>
+        </div>
+      </section>
+    </template>
+
+    <template id="test-attribute-adjacent">
+      <span class="{{class}} {{otherClass}}"></span>
+    </template>
+
+    <template id="test-attribute-multiple">
+      <span class="{{class}}"></span>
+      <span class="{{class}}"></span>
+    </template>
+
+    <template id="test-attribute-hyphen">
+      <span data-class="{{class}}"></span>
+    </template>
+  </section>
+
+  <section id="property-bindings">
+    <template id="test-property">
+      <span foo$={{foo}}></span>
+    </template>
+
+    <template id="test-property-nested">
+      <section>
+        <div>
+          <span foo$={{foo}}></span>
+        </div>
+      </section>
+    </template>
+
+    <template id="test-property-overload">
+      <span foo$="{{foo}} {{bar}}"></span>
+    </template>
+
+    <template id="test-property-multiple">
+      <span foo$={{foo}}></span>
+      <span foo$={{foo}}></span>
+    </template>
+
+    <template id="test-property-hyphen">
+      <span foo-bar$={{foo}}></span>
+    </template>
+  </section>
+
+  <section id="event-handler-bindings">
+    <template id="test-event-handler">
+      <button on-click={{clickHandler}}></button>
+    </template>
+
+    <template id="test-event-handler-nested">
+      <section>
+        <div>
+          <button on-click={{clickHandler}}></button>
+        </div>
+      </section>
+    </template>
+
+    <template id="test-event-handler-overload">
+      <button on-click="{{clickHandler}} {{clickHandler2}}"></button>
+    </template>
+
+    <template id="test-event-handler-multiple">
+      <button on-click={{clickHandler}}></button>
+      <button on-click={{clickHandler}}></button>
+    </template>
+
+    <template id="test-event-handler-hyphen">
+      <button on-foo-bar={{fooBarHandler}}></button>
+    </template>
+  </section>
 
   <script src="../dist/bound-template.js"></script>
   <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
+
   <script>
     QUnit.module('BoundTemplate', function() {
 
-      QUnit.module('create', function() {
+      function createTemplateAndInstantiate(id) {
 
-        QUnit.test('returns a template instance and a bindings object that syncs to the DOM', function(assert) {
+        const templateElement = document.getElementById(id);
+        const template = new BoundTemplate(templateElement);
 
-          const template = new BoundTemplate(document.getElementById('test-basic'));
-          const [instance, bindings] = template.create();
+        return template.create();
 
-          assert.deepEqual(instance.textContent, `\n    Hello ,\n\n    How are you doing ?\n\n    \n      Fare-thee-.\n    \n  `);
+      }
 
-          bindings.set('name', 'Zelda');
-          bindings.set('adjective', 'well');
-          bindings.set('suffix', '-san');
+      QUnit.module('Text Bindings', function() {
 
-          assert.deepEqual(instance.textContent, `\n    Hello Zelda-san,\n\n    How are you doing Zelda-san?\n\n    \n      Fare-thee-well.\n    \n  `);
+        QUnit.test('can insert values into text nodes', function(assert) {
 
-          bindings.set('name', 'Ganon');
-          bindings.set('adjective', 'poorly');
-          bindings.set('suffix', '');
+          const [instance, bindings] = createTemplateAndInstantiate('test-text');
 
-          assert.deepEqual(instance.textContent, `\n    Hello Ganon,\n\n    How are you doing Ganon?\n\n    \n      Fare-thee-poorly.\n    \n  `);
+          assert.equal(instance.textContent.trim(), '');
+
+          bindings.set('name', 'Trent');
+
+          assert.equal(instance.textContent.trim(), 'Trent');
+
+          bindings.set('name', 'tnerT');
+
+          assert.equal(instance.textContent.trim(), 'tnerT');
 
         });
 
-        QUnit.test('binds to attributes', function(assert) {
+        QUnit.test('can insert values into deeply nested text nodes', function(assert) {
 
-          const template = new BoundTemplate(document.getElementById('test-basic'));
-          const [instance, bindings] = template.create();
+          const [instance, bindings] = createTemplateAndInstantiate('test-text-nested');
 
-          const simple = instance.querySelector('p');
-          const greeting = instance.querySelector('.greeting');
-          const farewell = instance.querySelector('span[title]');
+          const element = instance.querySelector('div > p > a');
 
-          assert.notOk(simple.classList.contains('bold'));
-          assert.notOk(greeting.classList.contains('bold'));
-          assert.equal(farewell.getAttribute('title'), 'Fare-thee-');
+          assert.equal(element.textContent.trim(), '');
 
-          bindings.set('adjective', 'well');
-          bindings.set('class', 'bold');
-          bindings.set('class2', 'large');
+          bindings.set('name', 'Trent');
 
-          assert.ok(simple.classList.contains('bold'));
-          assert.ok(simple.classList.contains('large'));
-          assert.ok(greeting.classList.contains('bold'));
-          assert.ok(greeting.classList.contains('large'));
-          assert.equal(farewell.getAttribute('title'), 'Fare-thee-well');
+          assert.equal(element.textContent.trim(), 'Trent');
 
-          bindings.set('adjective', 'poorly');
-          bindings.set('class', 'italic small');
+          bindings.set('name', 'tnerT');
 
-          assert.equal(instance.querySelectorAll('.bold').length, 0);
-          assert.equal(instance.querySelectorAll('.bold.greeting').length, 0);
-          assert.equal(instance.querySelectorAll('[title="Fare-thee-well"]').length, 0);
+          assert.equal(element.textContent.trim(), 'tnerT');
 
-          assert.equal(instance.querySelectorAll('.italic.small').length, 2);
-          assert.equal(instance.querySelectorAll('.italic.small.greeting').length, 1);
-          assert.equal(instance.querySelectorAll('[title="Fare-thee-poorly"]').length, 1);
+        });
+
+        QUnit.test('can insert values into adjacent text nodes', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-text-adjacent');
+
+          assert.equal(instance.textContent.trim(), '');
+
+          bindings.set('firstName', 'Trent');
+          bindings.set('lastName', 'Willis');
+
+          assert.equal(instance.textContent.trim(), 'TrentWillis');
+
+          bindings.set('lastName', 'silliW');
+
+          assert.equal(instance.textContent.trim(), 'TrentsilliW');
+
+        });
+
+        QUnit.test('can insert the same value into multiple text nodes', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-text-multiple');
+
+          assert.equal(instance.textContent.trim(), '');
+
+          bindings.set('name', 'Trent');
+
+          assert.equal(instance.textContent.trim(), 'Trent\n          Trent');
+
+          bindings.set('name', 'tnerT');
+
+          assert.equal(instance.textContent.trim(), 'tnerT\n          tnerT');
+
+        });
+
+      });
+
+      QUnit.module('Attribute Bindings', function() {
+
+        QUnit.test('can insert values into element attributes', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-attribute');
+          const element = instance.querySelector('span');
+
+          assert.equal(element.getAttribute('class'), '');
+
+          bindings.set('class', 'awesome');
+
+          assert.equal(element.getAttribute('class'), 'awesome');
+
+          bindings.set('class', {});
+
+          assert.equal(element.getAttribute('class'), '[object Object]');
+
+          bindings.set('class', []);
+
+          assert.equal(element.getAttribute('class'), '');
+
+          bindings.set('class', 'emosewa');
+
+          assert.equal(element.getAttribute('class'), 'emosewa');
+
+        });
+
+        QUnit.test('can insert values into deeply nested element attributes', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-attribute-nested');
+          const element = instance.querySelector('section > div > span');
+
+          assert.equal(element.getAttribute('class'), '');
+
+          bindings.set('class', 'awesome');
+
+          assert.equal(element.getAttribute('class'), 'awesome');
+
+          bindings.set('class', 'emosewa');
+
+          assert.equal(element.getAttribute('class'), 'emosewa');
+
+        });
+
+        QUnit.test('can insert values into adjacent bindings in an element attribute', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-attribute-adjacent');
+          const element = instance.querySelector('span');
+
+          assert.equal(element.getAttribute('class'), ' ');
+
+          bindings.set('class', 'awesome');
+          bindings.set('otherClass', 'cool');
+
+          assert.equal(element.getAttribute('class'), 'awesome cool');
+
+          bindings.set('class', 'emosewa');
+
+          assert.equal(element.getAttribute('class'), 'emosewa cool');
+
+          bindings.set('otherClass', 'looc');
+
+          assert.equal(element.getAttribute('class'), 'emosewa looc');
+
+        });
+
+        QUnit.test('can insert values into multiple different element attributes', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-attribute-multiple');
+          const elements = instance.querySelectorAll('span');
+
+          assert.equal(elements[0].getAttribute('class'), '');
+          assert.equal(elements[1].getAttribute('class'), '');
+
+          bindings.set('class', 'awesome');
+
+          assert.equal(elements[0].getAttribute('class'), 'awesome');
+          assert.equal(elements[1].getAttribute('class'), 'awesome');
+
+          bindings.set('class', 'emosewa');
+
+          assert.equal(elements[0].getAttribute('class'), 'emosewa');
+          assert.equal(elements[1].getAttribute('class'), 'emosewa');
+
+        });
+
+        QUnit.test('can insert values into element attributes with hyphenated names', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-attribute-hyphen');
+          const element = instance.querySelector('span');
+
+          assert.equal(element.getAttribute('data-class'), '');
+
+          bindings.set('class', 'awesome');
+
+          assert.equal(element.getAttribute('data-class'), 'awesome');
+
+          bindings.set('class', 'emosewa');
+
+          assert.equal(element.getAttribute('data-class'), 'emosewa');
+
+        });
+
+      });
+
+      QUnit.module('Property Bindings', function() {
+
+        QUnit.test('can insert values as properties on an element', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-property');
+          const element = instance.querySelector('span');
+
+          assert.deepEqual(element.props, {
+            foo: null
+          });
+
+          bindings.set('foo', {
+            bar: 1337
+          });
+
+          assert.deepEqual(element.props, {
+            foo: {
+              bar: 1337
+            }
+          });
+
+          bindings.set('foo', [1, 2, 3]);
+
+          assert.deepEqual(element.props, {
+            foo: [1, 2, 3]
+          });
+
+        });
+
+        QUnit.test('can insert values as properties on a deeply nested element', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-property-nested');
+          const element = instance.querySelector('section > div > span');
+
+          assert.deepEqual(element.props, {
+            foo: null
+          });
+
+          bindings.set('foo', {
+            bar: 1337
+          });
+
+          assert.deepEqual(element.props, {
+            foo: {
+              bar: 1337
+            }
+          });
+
+        });
+
+        QUnit.test('ignores multiple values inserted as a single property on an element', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-property-overload');
+          const element = instance.querySelector('span');
+
+          assert.deepEqual(element.props, {
+            foo: null
+          });
+
+          bindings.set('foo', {});
+          bindings.set('bar', {});
+
+          assert.deepEqual(element.props, {
+            foo: {}
+          });
+
+        });
+
+        QUnit.test('can insert values as properties on multiple elements', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-property-multiple');
+          const elements = instance.querySelectorAll('span');
+
+          assert.deepEqual(elements[0].props, { foo: null });
+          assert.deepEqual(elements[1].props, { foo: null });
+
+          bindings.set('foo', {
+            bar: 1337
+          });
+
+          assert.deepEqual(elements[0].props, {
+            foo: {
+              bar: 1337
+            }
+          });
+          assert.deepEqual(elements[1].props, {
+            foo: {
+              bar: 1337
+            }
+          });
+
+        });
+
+        QUnit.test('can insert values as properties with hyphenated names on an element', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-property-hyphen');
+          const element = instance.querySelector('span');
+
+          assert.deepEqual(element.props, {
+            fooBar: null
+          });
+
+          bindings.set('foo', {
+            bar: 1337
+          });
+
+          assert.deepEqual(element.props, {
+            fooBar: {
+              bar: 1337
+            }
+          });
+
+          bindings.set('foo', [1, 2, 3]);
+
+          assert.deepEqual(element.props, {
+            fooBar: [1, 2, 3]
+          });
+
+        });
+
+      });
+
+      QUnit.module('Event Handler Bindings', function() {
+
+        QUnit.test('can insert event handlers on an element', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-event-handler');
+          const element = instance.querySelector('button');
+
+          bindings.set('clickHandler', () => {
+            assert.step('click');
+          });
+
+          element.click();
+
+          bindings.set('clickHandler', () => {
+            assert.step('click2');
+          });
+
+          element.click();
+
+          assert.verifySteps([
+            'click',
+            'click2'
+          ]);
+
+        });
+
+        QUnit.test('can insert event handlers on a deeply nested element', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-event-handler-nested');
+          const element = instance.querySelector('section > div > button');
+
+          bindings.set('clickHandler', () => {
+            assert.step('click');
+          });
+
+          element.click();
+
+          bindings.set('clickHandler', () => {
+            assert.step('click2');
+          });
+
+          element.click();
+
+          assert.verifySteps([
+            'click',
+            'click2'
+          ]);
+
+        });
+
+        QUnit.test('ignores multiple handlers for a single event on an element', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-event-handler-overload');
+          const element = instance.querySelector('button');
+
+          bindings.setData({
+            clickHandler: () => {
+              assert.step('click');
+            },
+            clickHandler2: () => {
+              assert.step('click2');
+            }
+          });
+
+          element.click();
+
+          assert.verifySteps([
+            'click'
+          ]);
+
+        });
+
+        QUnit.test('can insert event handlers on multiple elements', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-event-handler-multiple');
+          const elements = instance.querySelectorAll('button');
+
+          bindings.set('clickHandler', () => {
+            assert.step('click');
+          });
+
+          elements[0].click();
+          elements[1].click();
+
+          assert.verifySteps([
+            'click',
+            'click'
+          ]);
+
+        });
+
+        QUnit.test('can insert event handlers with hyphenated names on an element', function(assert) {
+
+          const [instance, bindings] = createTemplateAndInstantiate('test-event-handler-hyphen');
+          const element = instance.querySelector('button');
+
+          bindings.set('fooBarHandler', () => {
+            assert.step('fooBar');
+          });
+
+          element.dispatchEvent(new CustomEvent('fooBar'));
+
+          assert.verifySteps([
+            'fooBar'
+          ]);
 
         });
 

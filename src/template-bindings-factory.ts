@@ -45,7 +45,7 @@ export default class TemplateBindingsFactory {
 
   addAttributeBinding(names: string[], attrName: string, path: number[]) {
 
-    const eventName = attrName.startsWith('on-') ? attrName.substr(3) : '';
+    const eventName = (attrName.startsWith('on-') ? attrName.substr(3) : '').replace(/-([a-z])/g, (g) => g[1].toUpperCase());
     const isProperty = attrName.endsWith('$');
 
     this._attributeBindings.push({
@@ -105,7 +105,7 @@ export default class TemplateBindingsFactory {
       } else if (isProperty) {
 
         const ownerElement = attrNode.ownerElement;
-        const propName = attrNode.name.slice(0, -1);
+        const propName = attrNode.name.slice(0, -1).replace(/-([a-z])/g, (g) => g[1].toUpperCase());
         const binding: BoundPropertyNode = {
           node: ownerElement,
           propName
