@@ -62,7 +62,7 @@
 
         this.props.changeName = (e) => {
 
-          this.props.name = e.target.value || 'Someone';
+          this.props.name = e.target.value;
 
         };
       }
@@ -81,7 +81,9 @@
         color: blue;
       }
     </style>
-    <p class="{{color}} greeting">Hello, {{name}}!</p>
+    <bound-if if$={{name}}>
+      <p class="{{color}} greeting">Hello, {{name}}!</p>
+    </bound-if>
     <input type="checkbox" on-change={{toggleColor}}>
   </template>
 
@@ -94,7 +96,6 @@
       constructor() {
         super();
 
-        this.props.name = 'Someone';
         this.props.color = 'blue';
         this.props.toggleColor = () => {
 
@@ -105,6 +106,37 @@
     }
 
     customElements.define(HelloName.is, HelloName);
+  </script>
+
+  <script>
+    class BoundIf extends HTMLElement {
+      static get is() {
+        return 'bound-if';
+      }
+
+      constructor() {
+        super();
+
+        this.props = new Proxy({}, {
+          set: (target, prop, value) => {
+            if (prop === 'if') {
+              this.updateDisplay(!!value);
+            }
+
+            return Reflect.set(target, prop, value);
+          }
+        });
+        this.updateDisplay();
+      }
+
+      updateDisplay(display) {
+
+        this.style.display = display ? '' : 'none';
+
+      }
+    }
+
+    customElements.define(BoundIf.is, BoundIf);
   </script>
 </body>
 </html>
