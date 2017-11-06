@@ -10,7 +10,7 @@
 </head>
 
 <body>
-  <name-input></name-input>
+  <multiple-name-input></multiple-name-input>
 
   <script src="../dist/bound-template.js"></script>
 
@@ -46,7 +46,54 @@
     }
   </script>
 
+  <script>
+    class BoundForeach extends HTMLElement {
+      static get is() {
+        return 'bound-foreach';
+      }
+
+      constructor() {
+        super();
+
+        this.attachShadow({ mode: 'open' });
+        const template = new BoundTemplate(this.querySelector('template'));
+        for (let i = 0; i < 5; i++) {
+          const [instance] = template.create();
+          this.shadowRoot.appendChild(instance);
+        }
+      }
+    }
+
+    customElements.define(BoundForeach.is, BoundForeach);
+  </script>
+
+  <template id="multiple-name-input-template">
+    <bound-foreach>
+      <template>
+        <name-input></name-input>
+      </template>
+    </bound-foreach>
+  </template>
+
+  <script>
+    class MultipleNameInput extends BoundElement {
+      static get is() {
+        return 'multiple-name-input';
+      }
+    }
+
+    customElements.define(MultipleNameInput.is, MultipleNameInput);
+  </script>
+
   <template id="name-input-template">
+    <style>
+      :host {
+        display: block;
+        border: 1px solid #333;
+        padding: 0.5rem;
+        margin: 0.5rem;
+      }
+    </style>
     <hello-name name$={{name}}></hello-name>
     <input type="text" placeholder="Name" on-input={{changeName}}>
   </template>
