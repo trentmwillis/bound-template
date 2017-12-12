@@ -1,5 +1,8 @@
 # BoundTemplate
 
+[![Build Status](https://travis-ci.org/trentmwillis/bound-template.svg?branch=master)](https://travis-ci.org/trentmwillis/bound-template)
+[![npm version](https://badge.fury.io/js/bound-template.svg)](https://badge.fury.io/js/bound-template)
+
 A micro-library for binding data to [HTML Templates](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template).
 
 ## Goals
