@@ -1,6 +1,6 @@
 {
   "name": "bound-template",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A micro-library for inserting data into HTML Templates via named bindings",
   "main": "dist/bound-template.js",
   "scripts": {
@@ -9,13 +9,13 @@
     "build:watch": "rollup -c rollup.config.js --watch",
     "lint": "tslint --project ./",
     "size": "uglifyjs dist/bound-template.js -mc | gzip -9 | wc -c",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "testem ci"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/trentmwillis/bound-template.git"
   },
-  "author": "",
+  "author": "Trent Willis <trentmwillis@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/trentmwillis/bound-template/issues"
@@ -25,6 +25,7 @@
     "qunitjs": "^2.4.0",
     "rollup": "^0.50.0",
     "rollup-plugin-typescript": "^0.8.1",
+    "testem": "^1.18.4",
     "tslint": "^5.8.0",
     "typescript": "^2.5.3",
     "uglify-es": "^3.1.3"
