@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A micro-library for inserting data into HTML Templates via named bindings",
   "main": "dist/bound-template.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "build:minify": "uglifyjs dist/bound-template.js -mc -o dist/bound-template.min.js",
@@ -24,7 +25,7 @@
   "devDependencies": {
     "qunitjs": "^2.4.0",
     "rollup": "^0.50.0",
-    "rollup-plugin-typescript": "^0.8.1",
+    "rollup-plugin-typescript2": "^0.8.1",
     "testem": "^1.18.4",
     "tslint": "^5.8.0",
     "typescript": "^2.5.3",

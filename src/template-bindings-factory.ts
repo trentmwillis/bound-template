@@ -27,8 +27,8 @@ interface AttributeBinding extends Binding {
  */
 export default class TemplateBindingsFactory {
 
-  _textBindings: TextBinding[];
-  _attributeBindings: AttributeBinding[];
+  private _textBindings: TextBinding[];
+  private _attributeBindings: AttributeBinding[];
 
   constructor() {
 
