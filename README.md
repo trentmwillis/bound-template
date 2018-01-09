@@ -102,5 +102,3 @@ bindings.setData({
   name: 'Zelda'
 });
 ```
-
-For further examples, see the [`Examples` folder](./examples).
